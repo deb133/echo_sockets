@@ -16,7 +16,7 @@ def server(log_buffer=sys.stderr):
 
     # TODO: bind your new sock 'sock' to the address above and begin to listen
     #       for incoming connections
-    sock.bind(server_address)
+    sock.bind(address)
     print >>sys.stderr, 'starting up on %s port %s' % sock.getsockname()
     sock.listen(1)
     try:

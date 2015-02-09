@@ -1,6 +1,6 @@
 import socket
 import sys
-
+import mimetypes
 
 def response_ok():
     """returns a basic HTTP response"""
@@ -10,7 +10,7 @@ def response_ok():
     resp.append("")
     resp.append("this is a pretty minimal response")
     return "\r\n".join(resp)
-
+    
 
 def response_method_not_allowed():
     """returns a 405 Method Not Allowed response"""
@@ -27,6 +27,22 @@ def parse_request(request):
         raise NotImplementedError("We only accept GET")
     print >>sys.stderr, 'request is okay'
     return uri
+
+def resolve_uri(uri):
+    home = 'webroot'
+    filename = os.path.join(home, uri.lstrip('/'))
+    if os.path.isfile(filename):
+        ext = os.path.splitext(filename)[1]
+        mimetype = mimetypes.types_map.get(ext, 'text/plain')
+        contents = open(filename, 'rb').read()
+        return contents, mimetype
+
+def response_not_found():
+    """call the response not found"""
+    resp = []
+    resp.append("HTTP/1.1 404 Not Found")
+    resp.append("")
+    return "\r\n".join(resp)   
 
 
 def server():
@@ -64,11 +80,10 @@ def server():
                 conn.sendall(response)
             finally:
                 conn.close()
-                
+            
     except KeyboardInterrupt:
         sock.close()
         return
-
 
 if __name__ == '__main__':
     server()
